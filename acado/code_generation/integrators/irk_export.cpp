@@ -575,6 +575,7 @@ DMatrix ImplicitRungeKuttaExport::formMatrix( const DMatrix& mass, const DMatrix
 
 returnValue ImplicitRungeKuttaExport::solveInputSystem( ExportStatementBlock* block, const ExportIndex& index1, const ExportIndex& index2, const ExportIndex& index3, const ExportIndex& tmp_index, const ExportVariable& Ah )
 {
+	block->addComment("Start of solveInputSystem\n");
 	if( NX1 > 0 ) {
 		block->addStatement( rk_xxx.getCols(0,NX1) == rk_eta.getCols(0,NX1) );
 		block->addFunctionCall( lin_input.getName(), rk_xxx, rk_rhsTemp.getAddress(0,0) );
@@ -602,10 +603,12 @@ returnValue ImplicitRungeKuttaExport::solveInputSystem( ExportStatementBlock* bl
 
 returnValue ImplicitRungeKuttaExport::solveImplicitSystem( ExportStatementBlock* block, const ExportIndex& index1, const ExportIndex& index2, const ExportIndex& index3, const ExportIndex& tmp_index, const ExportIndex& k_index, const ExportVariable& Ah, const ExportVariable& C, const ExportVariable& det, bool DERIVATIVES )
 {
+	block->addComment("\nStart of solveImplicitSystem\n");
 	if( NX2 > 0 || NXA > 0 ) {
 
 		if( DERIVATIVES && REUSE ) block->addStatement( std::string( "if( " ) + reset_int.getFullName() + " ) {\n" );
 		// Initialization iterations:
+		block->addComment("\nInitialization iterations\n");
 		ExportForLoop loop1( index1,0,numItsInit+1 ); // NOTE: +1 because 0 will lead to NaNs, so the minimum number of iterations is 1 at the initialization
 		ExportForLoop loop11( index2,0,numStages );
 		evaluateMatrix( &loop11, index2, index3, tmp_index, k_index, rk_A, Ah, C, true, DERIVATIVES );
@@ -619,6 +622,7 @@ returnValue ImplicitRungeKuttaExport::solveImplicitSystem( ExportStatementBlock*
 		if( DERIVATIVES && REUSE ) block->addStatement( std::string( "}\n" ) );
 
 		// the rest (numIts) of the Newton iterations with reuse of the Jacobian (no evaluation or factorization needed)
+		block->addComment("\nNewton iterations with reuse of Jacobian\n");
 		ExportForLoop loop2( index1,0,numIts );
 		ExportForLoop loop21( index2,0,numStages );
 		evaluateStatesImplicitSystem( &loop21, k_index, Ah, C, index2, index3, tmp_index );
@@ -652,6 +656,7 @@ returnValue ImplicitRungeKuttaExport::solveImplicitSystem( ExportStatementBlock*
 
 returnValue ImplicitRungeKuttaExport::solveOutputSystem( ExportStatementBlock* block, const ExportIndex& index1, const ExportIndex& index2, const ExportIndex& index3, const ExportIndex& tmp_index, const ExportVariable& Ah, bool DERIVATIVES )
 {
+	block->addComment("\nStart of solveOutputSystem\n");
 	if( NX3 > 0 ) {
 		ExportForLoop loop( index1,0,numStages );
 		evaluateStatesOutputSystem( &loop, Ah, index1 );
@@ -676,6 +681,7 @@ returnValue ImplicitRungeKuttaExport::solveOutputSystem( ExportStatementBlock* b
 
 returnValue ImplicitRungeKuttaExport::evaluateStatesImplicitSystem( ExportStatementBlock* block, const ExportIndex& k_index, const ExportVariable& Ah, const ExportVariable& C, const ExportIndex& stage, const ExportIndex& i, const ExportIndex& tmp_index )
 {
+	block->addComment("\nStart of evaluateStatesImplicitSystem\n");
 	ExportForLoop loop1( i, 0, NX1+NX2 );
 	loop1.addStatement( rk_xxx.getCol( i ) == rk_eta.getCol( i ) );
 	loop1.addStatement( tmp_index == k_index + i );
@@ -792,6 +798,7 @@ returnValue ImplicitRungeKuttaExport::generateOutput( ExportStatementBlock* bloc
 		const ExportIndex& index1, const ExportIndex& tmp_index1, const ExportIndex& tmp_index2,
 		const ExportVariable& tmp_meas, const ExportVariable& time_tmp, const uint directions )
 {
+	block->addComment("Start of generateOutput\n");
 	uint i, j;
 	int measGrid;
 	get( MEASUREMENT_GRID, measGrid );

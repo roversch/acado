@@ -508,7 +508,7 @@ returnValue SIMexport::exportTest(	const std::string& _dirName,
 		main.addStatement( "      		}\n" );
 	}
     main.addLinebreak( );
-    std::string integrate( "      		integrate( x" );
+    std::string integrate( "      		" + moduleName + "_integrate( x" );
     for( i = 0; i < (int)outputGrids.size(); i++ ) {
 		integrate += string(", out") + toString(i);
 	}
@@ -546,7 +546,7 @@ returnValue SIMexport::exportTest(	const std::string& _dirName,
 		main.addStatement( "      		for( j=0; j < (" + modulePrefix + "_NX+" + modulePrefix + "_NXA); j++ ) {\n" );
 		main.addStatement( "      			x[j] = xT[j];\n" );
 		main.addStatement( "      		}\n" );
-		integrate = std::string( "      		integrate( x" );
+		integrate = std::string( "      		" + moduleName + "_integrate( x" );
 		for( i = 0; i < (int)outputGrids.size(); i++ ) {
 			integrate += string(", out") + toString(i);
 		}
